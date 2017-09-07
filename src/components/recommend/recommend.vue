@@ -2,15 +2,14 @@
         <div class="recommend">
           <scroll ref="scroll" class="recommend-content" :data="discList">
             <div>
-              <div  class="swiper-container" id="slide">
-                <div class="swiper-wrapper">
-                  <div class="swiper-slide" v-for="str in recommends">
-                    <a :href="str.linkUrl">
-                      <img  @load="loadImage" :src="str.picUrl" alt="">
+              <div v-if="recommends.length" class="slider-wrapper" ref="sliderWrapper">
+                <slider>
+                  <div v-for="item in recommends">
+                    <a :href="item.linkUrl">
+                      <img class="needsclick" @load="loadImage" :src="item.picUrl">
                     </a>
                   </div>
-                </div>
-                <div class="swiper-pagination"></div>
+                </slider>
               </div>
               <div class="recommend-list">
                 <h1 class="list-title">热门歌单推荐</h1>
@@ -36,8 +35,7 @@
 </template>
 
 <script>
-  import Swiper from 'swiper';
-  import 'swiper/dist/css/swiper.min.css';
+  import Slider from "../../base/slider/slider";
   import Scroll from '../../base/scroll/scroll';
   import Loading from '../../base/loading/loading';
   import {getRecommend,getDiscList} from '../../api/recommend';
@@ -59,9 +57,6 @@
             if (res.code === ERR_ok) {
               this.recommends = res.data.slider;
 //              console.log(res.data.slider);
-              this.$nextTick(function () {
-                this._silder();
-              })
             }
           })
         },
@@ -80,24 +75,11 @@
             this.checkLoaded = true;
           }
         },
-        _silder() {
-          var mySwiper = new Swiper('#slide', {
-            autoplay: 3000,
-            loop: true,
-            autoplayDisableOnInteraction : false,//是否禁止auto
-            pagination: '.swiper-pagination',
-            slidesPerView: 1,
-            paginationClickable: true,
-            centeredSlides: true,
-            observer:true,//修改swiper自己或子元素时，自动初始化swiper
-            observeParents:true,//修改swiper的父元素时，自动初始化swiper
-          });
-        },
-
       },
       components : {
         Scroll,
-        Loading
+        Loading,
+        Slider
       }
     }
 </script>
@@ -113,27 +95,10 @@
     .recommend-content {
       height: 100%;
       overflow: hidden;
-      .swiper-container {
+      .slider-wrapper {
+        position: relative;
         width: 100%;
-        .swiper-wrapper {
-          width: 100%;
-          height: 100%;
-        }
-        .swiper-slide {
-          background-position: center;
-          background-size: cover;
-          width: 100%;
-          height: 100%;
-          img {
-            width: 100%;
-            height: 100%;
-          }
-        }
-        .swiper-pagination-bullet-active {
-          width: 20px;
-          border-radius: 5px;
-          background-color: hsla(0,0%,100%,.5);
-        }
+        overflow: hidden;
       }
       .recommend-list {
         .list-title {
@@ -164,7 +129,6 @@
             .name {
               margin-bottom: 10px;
               color: @color-text;
-              .no-wrap();
             }
             .desc {
               color: @color-text-d;
